@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5d6dcc4d-0949-4510-852b-7a4d7ce35a3c" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="ac2618bb-2b7f-49e9-98df-16ff376f9f38" file="dev-config.yaml" />
+	<flow name="calculatorFlow" doc:id="d7f4d51e-eb45-45bf-9a76-0d1a639e786a" >
+		<http:listener doc:name="Listener" doc:id="6d89e631-1061-4936-af31-ade4a55d46af" config-ref="HTTP_Listener_config" path="/operation"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d49f8512-16f9-414e-8058-69bb593a52a5" message="*****API STARTS****"/>
+		<set-variable value="#[attributes.queryParams.num1]" doc:name="num1" doc:id="f9eb8f36-75fe-4f7a-82a1-7019fb711ead" variableName="num1"/>
+		<set-variable value="#[attributes.queryParams.num2]" doc:name="num2" doc:id="967fa1a3-e11f-49aa-91fc-df36b45b1784" variableName="num2"/>
+		<ee:transform doc:name="Transform Message" doc:id="b76f12c1-2a98-4399-b10e-076d2fcf51e4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "Success",
+	"Add": vars.num1 as Number + vars.num2 as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="89f7daee-66a0-4ef4-b18c-bc51050241d1" message="****API ENDS******"/>
+	</flow>
+</mule>
